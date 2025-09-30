@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres - Level Up IA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">Level Up IA</h1>
+            <div class="nav-links">
+                <a href="/">Accueil</a>
+                <a href="/settings.html" class="active">Paramètres</a>
+                <button onclick="logout()" class="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="settings-card">
+            <h2>Paramètres du compte</h2>
+            
+            <div class="settings-section">
+                <h3>Informations personnelles</h3>
+                <div class="form-group">
+                    <label for="userName">Nom</label>
+                    <input type="text" id="userName" placeholder="Votre nom">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" placeholder="Votre email">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Préférences IA</h3>
+                <div class="form-group">
+                    <label for="defaultLanguage">Langue de sortie par défaut</label>
+                    <select id="defaultLanguage">
+                        <option value="Français">Français</option>
+                        <option value="Anglais">Anglais</option>
+                        <option value="Espagnol">Espagnol</option>
+                        <option value="Allemand">Allemand</option>
+                        <option value="Italien">Italien</option>
+                        <option value="Portugais">Portugais</option>
+                        <option value="Arabe">Arabe</option>
+                        <option value="Chinois">Chinois</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Utilisation quotidienne</h3>
+                <div class="usage-info">
+                    <div class="usage-stat">
+                        <span class="usage-label">Requêtes utilisées aujourd'hui:</span>
+                        <span class="usage-value" id="usageCount">0</span>
+                    </div>
+                    <div class="usage-stat">
+                        <span class="usage-label">Requêtes restantes:</span>
+                        <span class="usage-value" id="remainingCount">50</span>
+                    </div>
+                    <div class="usage-bar">
+                        <div class="usage-progress" id="usageProgress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="saveSettings()" class="btn-primary">Enregistrer les modifications</button>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = '/login.html';
+            }
+            return user;
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : 'success'} show`;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        async function loadSettings() {
+            const user = checkAuth();
+            
+            const userEmail = document.getElementById('userEmail');
+            const userName = document.getElementById('userName');
+            
+            if (user.email) userEmail.value = user.email;
+            if (user.name) userName.value = user.name;
+
+            try {
+                const response = await fetch('/api/settings/get', {
+                    headers: {
+                        'x-user-id': user.uid
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.preferences) {
+                        if (data.preferences.name) userName.value = data.preferences.name;
+                        if (data.preferences.email) userEmail.value = data.preferences.email;
+                        if (data.preferences.defaultLanguage) {
+                            document.getElementById('defaultLanguage').value = data.preferences.defaultLanguage;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur chargement paramètres:', error);
+            }
+
+            loadUsage();
+        }
+
+        async function loadUsage() {
+            const user = checkAuth();
+            
+            try {
+                const response = await fetch('/api/usage', {
+                    headers: {
+                        'x-user-id': user.uid
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('usageCount').textContent = data.usage;
+                    document.getElementById('remainingCount').textContent = data.remaining;
+                    
+                    const percentage = (data.usage / data.limit) * 100;
+                    document.getElementById('usageProgress').style.width = percentage + '%';
+                }
+            } catch (error) {
+                console.error('Erreur chargement usage:', error);
+            }
+        }
+
+        async function saveSettings() {
+            const user = checkAuth();
+            
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const defaultLanguage = document.getElementById('defaultLanguage').value;
+
+            if (!name || !email) {
+                showNotification('Veuillez remplir tous les champs', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/settings/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: user.uid,
+                        name,
+                        email,
+                        defaultLanguage
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    user.name = name;
+                    user.email = email;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    showNotification('Paramètres enregistrés avec succès!');
+                } else {
+                    showNotification(data.error || 'Erreur lors de l\'enregistrement', true);
+                }
+            } catch (error) {
+                showNotification('Erreur de connexion au serveur', true);
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>

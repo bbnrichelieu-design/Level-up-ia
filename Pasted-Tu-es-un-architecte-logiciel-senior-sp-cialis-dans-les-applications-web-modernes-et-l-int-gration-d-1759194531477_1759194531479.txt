@@ -1,0 +1,51 @@
+Tu es un architecte logiciel senior spécialisé dans les applications web modernes et l'intégration de l'IA multimodale. Ton rôle est de générer le code source complet de l'application web nommée "Level Up IA".
+
+OBJECTIF ET STACK TECHNIQUE :
+1.  **Fonction Principale :** Offrir trois modes de transformation de texte, plus des fonctions multimodales, basés sur l'API Gemini.
+2.  **Stack :** Backend Node.js (Express) et frontend moderne (HTML/CSS/JS) avec un accent mis sur la **fluidité et la réactivité**.
+3.  **Sécurité et Coût (Crucial) :**
+    * Utilisation de **Firebase Authentication** (Email/Mot de passe ET Connexion Google) pour la gestion des utilisateurs.
+    * Clé API Gemini (API_KEY) **cachée** et utilisée uniquement sur le backend.
+    * Le backend doit implémenter une **limite d'usage stricte par utilisateur** (ex: 50 requêtes/jour) pour garantir l'utilisation du **Niveau Gratuit**.
+
+EXIGENCES DE DESIGN ET FLUIDITÉ (Nouveau !) :
+* **Fluidité :** L'interface doit être entièrement **responsive** (adaptée au mobile et au desktop). Le design doit minimiser les rechargements de page. Utiliser des **animations CSS minimales** (chargement, transitions) pour une perception de vitesse et de qualité.
+* **Thème :** Design épuré, mode sombre par défaut, et une police de caractère moderne pour un look professionnel ("Level Up").
+
+EXIGENCES FONCTIONNELLES - LA STRUCTURE :
+1.  **Page Paramètres (Nouveau !) :** Créer une page `/settings` accessible uniquement aux utilisateurs connectés.
+    * **Fonction :** Permettre aux utilisateurs de modifier leurs informations de profil de base (Nom, Email).
+    * **Fonction :** Permettre de modifier la langue de sortie par défaut pour tous les modes IA (ex: toujours générer en français).
+2.  **Page Principale :** Contenant la zone de saisie et le sélecteur de mode.
+
+LES TROIS MODES IA (Logique du Backend) :
+
+L'endpoint de l'IA doit accepter les paramètres suivants et générer la consigne (prompt) appropriée pour Gemini. La **langue de sortie par défaut** de l'utilisateur doit être incluse dans chaque consigne.
+
+1.  **MODE : Résumeur Intelligent**
+    * **Paramètre :** `format` ('3-points' ou '100-mots').
+    * **Consigne pour Gemini :** "Résume le texte ci-dessous. [FORMAT] Le résultat doit être en [LANGUE PAR DÉFAUT]."
+
+2.  **MODE : Générateur de Recettes (avec Contraintes)**
+    * **Paramètre :** `contrainte_alim` ('Végétarien' ou 'Omnivore').
+    * **Consigne pour Gemini :** "Utilise uniquement la liste d'ingrédients fournie pour générer une recette complète. La contrainte alimentaire est [CONTRAINTE]. Le résultat doit être en [LANGUE PAR DÉFAUT]."
+
+3.  **MODE : Polissage d'Écrit Formel**
+    * **Paramètre :** `ton` ('Formel' ou 'Amical').
+    * **Consigne pour Gemini :** "Réécris le texte ci-dessous. Modifie le ton pour qu'il soit [TON CHOISI], tout en conservant le message principal. Le résultat doit être en [LANGUE PAR DÉFAUT]."
+
+EXIGENCES MULTIMODALES (Nouveau et Avancé !) :
+
+Le backend doit être capable de gérer l'envoi de données complexes à Gemini, en utilisant l'API Gemini pour toutes les requêtes.
+
+1.  **Vocal (Audio) :**
+    * **Fonction :** L'utilisateur doit pouvoir enregistrer ou uploader un fichier audio.
+    * **Tâche pour Gemini :** L'IA doit transcrire le contenu vocal et appliquer le mode IA choisi au texte transcrit (ex: transcrire un enregistrement et le résumer).
+2.  **Image et Fichiers (Multimodale) :**
+    * **Fonction :** L'utilisateur doit pouvoir uploader des images ou des documents (si possible, PDF ou DOCX simples).
+    * **Tâche pour Gemini :** Si un document est uploader, l'IA doit extraire le texte et appliquer le mode IA choisi. Si une image est uploader, l'IA doit "lire" le contenu de l'image (ex: reconnaître les ingrédients sur une photo de frigo pour le mode Recette).
+3.  **Génération d'Images (Synthèse) :**
+    * **Fonction :** Créer un mode IA supplémentaire : **MODE 4 : Générateur d'Images**.
+    * **Tâche pour Gemini :** L'utilisateur entre une description de l'image (ex: "un robot joyeux code un site web"), et l'IA doit générer l'image correspondante. Utiliser un modèle d'IA générative d'images (comme Imagen, via Gemini ou une API intégrée) si possible dans le stack Node.js/Express.
+
+**Livrable final :** Fournis le code complet et commenté pour l'architecture Node.js/Express/Firebase/Gemini, incluant la gestion de l'état de l'utilisateur et tous les prompts conditionnels pour les 4 modes IA et la gestion des fichiers/audio.

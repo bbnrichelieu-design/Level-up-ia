@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Up IA - Transformez vos idées</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">Level Up IA</h1>
+            <div class="nav-links">
+                <a href="/" class="active">Accueil</a>
+                <a href="/settings.html">Paramètres</a>
+                <button onclick="logout()" class="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h2>Transformez vos idées avec l'IA</h2>
+            <p>Résumez, créez des recettes, polissez vos écrits et plus encore</p>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="resume" onclick="selectMode('resume')">
+                📝 Résumeur Intelligent
+            </button>
+            <button class="mode-btn" data-mode="recette" onclick="selectMode('recette')">
+                🍳 Générateur de Recettes
+            </button>
+            <button class="mode-btn" data-mode="polissage" onclick="selectMode('polissage')">
+                ✨ Polissage d'Écrit
+            </button>
+            <button class="mode-btn" data-mode="image" onclick="selectMode('image')">
+                🖼️ Générateur d'Images
+            </button>
+        </div>
+
+        <div class="input-section">
+            <div class="options-panel">
+                <div id="resumeOptions" class="mode-options">
+                    <label>Format de résumé:</label>
+                    <select id="resumeFormat">
+                        <option value="3-points">3 points clés</option>
+                        <option value="100-mots">100 mots maximum</option>
+                    </select>
+                </div>
+
+                <div id="recetteOptions" class="mode-options" style="display: none;">
+                    <label>Contrainte alimentaire:</label>
+                    <select id="recetteContrainte">
+                        <option value="Omnivore">Omnivore</option>
+                        <option value="Végétarien">Végétarien</option>
+                    </select>
+                </div>
+
+                <div id="polissageOptions" class="mode-options" style="display: none;">
+                    <label>Ton souhaité:</label>
+                    <select id="polissageTon">
+                        <option value="Formel">Formel</option>
+                        <option value="Amical">Amical</option>
+                    </select>
+                </div>
+
+                <div id="imageOptions" class="mode-options" style="display: none;">
+                    <label>Description de l'image:</label>
+                    <p class="info-text">Décrivez l'image que vous souhaitez générer</p>
+                </div>
+            </div>
+
+            <div class="input-tabs">
+                <button class="tab-btn active" onclick="switchTab('text')">📝 Texte</button>
+                <button class="tab-btn" onclick="switchTab('audio')">🎤 Audio</button>
+                <button class="tab-btn" onclick="switchTab('image')">📷 Image</button>
+            </div>
+
+            <div id="textInput" class="input-tab active">
+                <textarea id="inputText" placeholder="Entrez votre texte ici..." rows="6"></textarea>
+                <button onclick="processText(event)" class="btn-primary btn-large">
+                    <span class="btn-text">Transformer avec l'IA</span>
+                    <span class="btn-loader" style="display: none;">⏳ Traitement...</span>
+                </button>
+            </div>
+
+            <div id="audioInput" class="input-tab" style="display: none;">
+                <div class="upload-area">
+                    <input type="file" id="audioFile" accept="audio/*" style="display: none;" onchange="handleAudioSelect(event)">
+                    <button onclick="document.getElementById('audioFile').click()" class="btn-upload">
+                        🎤 Choisir un fichier audio
+                    </button>
+                    <p id="audioFileName" class="file-name"></p>
+                </div>
+                <button onclick="processAudio(event)" class="btn-primary btn-large">
+                    <span class="btn-text">Transcrire et Transformer</span>
+                    <span class="btn-loader" style="display: none;">⏳ Traitement...</span>
+                </button>
+            </div>
+
+            <div id="imageInputTab" class="input-tab" style="display: none;">
+                <div class="upload-area">
+                    <input type="file" id="imageFile" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+                    <button onclick="document.getElementById('imageFile').click()" class="btn-upload">
+                        📷 Choisir une image
+                    </button>
+                    <p id="imageFileName" class="file-name"></p>
+                    <div id="imagePreview" class="image-preview"></div>
+                </div>
+                <button onclick="processImage(event)" class="btn-primary btn-large">
+                    <span class="btn-text">Analyser l'image</span>
+                    <span class="btn-loader" style="display: none;">⏳ Traitement...</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="resultSection" class="result-section" style="display: none;">
+            <h3>Résultat</h3>
+            <div id="transcriptionSection" style="display: none;">
+                <h4>Transcription:</h4>
+                <div id="transcriptionResult" class="result-box"></div>
+            </div>
+            <div id="resultContent" class="result-box"></div>
+            <div class="result-actions">
+                <button onclick="copyResult()" class="btn-secondary">📋 Copier</button>
+                <button onclick="clearResult()" class="btn-secondary">🗑️ Effacer</button>
+            </div>
+        </div>
+
+        <div class="usage-indicator">
+            <span id="usageInfo">Utilisation: 0/50 requêtes aujourd'hui</span>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
